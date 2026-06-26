@@ -1,0 +1,5 @@
+# Files that could be interviews
+.txt
+.docx
+
+__pycache__/
