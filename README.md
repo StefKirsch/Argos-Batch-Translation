@@ -2,15 +2,6 @@
 
 This project batch-translates `.txt` files with Argos Translate.
 
-It is designed for a simple workflow:
-
-1. Put source `.txt` files in `corpora/raw/`
-2. Run one Python script
-3. The script checks whether a suitable Argos model is already available
-4. If no suitable model is found, it downloads one
-5. It translates all `.txt` files into `corpora/translated/`
-6. It writes logs and metadata to `logs/` and `models/`
-
 The current default configuration translates Dutch to English.
 
 ---
