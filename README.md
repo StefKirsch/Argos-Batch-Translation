@@ -11,12 +11,7 @@ It is designed for a simple workflow:
 5. It translates all `.txt` files into `corpora/translated/`
 6. It writes logs and metadata to `logs/` and `models/`
 
-The current default configuration translates:
-
-```text
-Dutch → English
-nl → en
-```
+The current default configuration translates Dutch to English.
 
 ---
 
@@ -24,12 +19,18 @@ nl → en
 
 ### 1. Install Python
 
-Use Python 3.10 or newer.
-
-Check your Python version:
+Use Python 3.10 or newer. If you are unsure if it's already installed open Windows Powershell or your system's terminal and run
 
 ```powershell
 python --version
+```
+
+If you don't have Python installed yet, we recommend conda forge. You can download it [here](https://conda-forge.org/download/).
+
+Alternatively, you can also install `uv` as explained in the next step and then install Python like so:
+
+```powershell
+uv python install
 ```
 
 ### 2. Install `uv`
@@ -37,7 +38,7 @@ python --version
 If `uv` is not installed yet:
 
 ```powershell
-pip install uv
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
 Check that it works:
@@ -128,7 +129,7 @@ SOURCE_LANG = "de"
 TARGET_LANG = "en"
 ```
 
-### 4. Optional environment settings
+### 4. Optional settings
 
 For a CPU-only run:
 
