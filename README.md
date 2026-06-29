@@ -250,4 +250,5 @@ This makes it possible to check whether any input, output, or model file changed
 ## Terms of Use
 
 This code is licenced under the MIT license, which means its available for free and can be modified by anyone. When using this code for publications, please cite [Argos Translate](https://github.com/argosopentech/argos-translate/) as specified there. 
-We recommend including this code and the model metadata in your datapackage for transparency.
+
+We recommend including this code, the model metadata and the translation logs in your datapackage for transparency.
