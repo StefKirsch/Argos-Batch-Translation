@@ -17,6 +17,8 @@ The current default configuration translates Dutch to English.
 
 ## Installation
 
+The steps below only need to be performed once per machine.
+
 ### 1. Install Python
 
 Use Python 3.10 or newer. If you are unsure if it's already installed open Windows Powershell or your system's terminal and run
@@ -47,15 +49,19 @@ Check that it works:
 uv --version
 ```
 
-### 3. Create a virtual environment
+### 3. Create a virtual environment for the dependencies
 
-From the project folder:
+Navigate the powershell to the project folder. On Windows this can be done by navigating to that folder in the system explorer, typing `powershell` in the address bar and pressing `Enter`.
+
+![Open Windows Powershell by typing it in the explorer address bar.](docs/images/open_powershell_windows.png)
+
+Once Windows Powershell is open and pointing to the correct folder, create the a new virtual environment by running
 
 ```powershell
 uv venv
 ```
 
-Activate it:
+Then, activate it:
 
 ```powershell
 .venv\Scripts\activate
@@ -94,6 +100,10 @@ corpora/raw/interview_02.txt
 
 ### 2. Run the translation script
 
+Open a terminal and navigate to the root of the project folder. On Windows you can do this in the same way as explained in the step where we created a virtual environment.
+
+In the terminal/Powershell, run
+
 ```powershell
 python translate_batch.py
 ```
@@ -101,7 +111,7 @@ python translate_batch.py
 The script will:
 
 * download a suitable model if it is missing
-* install the local model into Argos
+* install the local model into Argos for the current session
 * translate every `.txt` file in `corpora/raw/`
 * write translated files to `corpora/translated/`
 
@@ -128,6 +138,8 @@ For example, German to English:
 SOURCE_LANG = "de"
 TARGET_LANG = "en"
 ```
+
+Please note that the script will download a new model for every new language pair.
 
 ### 4. Optional settings
 
