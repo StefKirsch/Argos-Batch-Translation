@@ -12,7 +12,7 @@ The steps below only need to be performed once per machine.
 
 ### 1. Install Python
 
-Use Python 3.10 or newer. If you are unsure if it's already installed open Windows Powershell or your system's terminal and run
+Use Python 3.10 or newer. If you are unsure if it's already installed, open Windows Powershell or your system's terminal and run
 
 ```powershell
 python --version
@@ -28,13 +28,13 @@ uv python install
 
 ### 2. Install `uv`
 
-If `uv` is not installed yet:
+If `uv` is not installed yet, run:
 
 ```powershell
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-Check that it works:
+Check that it works by opening a new Powershell or terminal window and run:
 
 ```powershell
 uv --version
@@ -42,11 +42,14 @@ uv --version
 
 ### 3. Create a virtual environment for the dependencies
 
-Navigate the powershell to the project folder. On Windows this can be done by navigating to that folder in the system explorer, typing `powershell` in the address bar and pressing `Enter`.
+Navigate Powershell/the terminal to the project folder. On Windows this can be done by 
+1. navigating to that folder in the system explorer
+2. typing `powershell` in the address bar
+3. pressing `Enter`.
 
 ![Open Windows Powershell by typing it in the explorer address bar.](docs/images/open_powershell_windows.png)
 
-Once Windows Powershell is open and pointing to the correct folder, create the a new virtual environment by running
+Once Windows Powershell is open and pointing to the correct folder, create the a new virtual environment by running:
 
 ```powershell
 uv venv
@@ -66,6 +69,8 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 ```
 
 ### 4. Install dependencies
+
+In Powershell/the terminal run:
 
 ```powershell
 uv pip install -r requirements.txt
@@ -241,3 +246,8 @@ The project uses SHA-256 hashes for:
 * each translated output file
 
 This makes it possible to check whether any input, output, or model file changed after translation.
+
+## Terms of Use
+
+This code is licenced under the MIT license, which means its available for free and can be modified by anyone. When using this code for publications, please cite [Argos Translate](https://github.com/argosopentech/argos-translate/) as specified there. 
+We recommend including this code and the model metadata in your datapackage for transparency.
