@@ -20,9 +20,9 @@ nl → en
 
 ---
 
-# Installation
+## Installation
 
-## 1. Install Python
+### 1. Install Python
 
 Use Python 3.10 or newer.
 
@@ -32,7 +32,7 @@ Check your Python version:
 python --version
 ```
 
-## 2. Install `uv`
+### 2. Install `uv`
 
 If `uv` is not installed yet:
 
@@ -46,7 +46,7 @@ Check that it works:
 uv --version
 ```
 
-## 3. Create a virtual environment
+### 3. Create a virtual environment
 
 From the project folder:
 
@@ -67,15 +67,15 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .venv\Scripts\activate
 ```
 
-## 4. Install dependencies
+### 4. Install dependencies
 
 ```powershell
 uv pip install -r requirements.txt
 ```
 
-# Usage
+## Usage
 
-## 1. Add source files
+### 1. Add source files
 
 Place your Dutch `.txt` files in:
 
@@ -91,7 +91,7 @@ corpora/raw/interview_02.txt
 ...
 ```
 
-## 2. Run the translation script
+### 2. Run the translation script
 
 ```powershell
 python translate_batch.py
@@ -112,7 +112,7 @@ corpora/translated/interview_02.en.txt
 ...
 ```
 
-## 3. Change the language pair
+### 3. Change the language pair
 
 Open `translate_batch.py` and change:
 
@@ -128,16 +128,17 @@ SOURCE_LANG = "de"
 TARGET_LANG = "en"
 ```
 
-## 4. Optional environment settings
+### 4. Optional environment settings
 
 For a CPU-only run:
 
 ```powershell
 $env:ARGOS_DEVICE_TYPE = "cpu"
 ```
+
 ---
 
-# Traceability Features
+## Traceability Features
 
 The project records information about the model, input files, output files, software environment, and translation run.
 
@@ -166,7 +167,7 @@ These files record:
 * model SHA-256 checksum
 * selection rule used for choosing the model
 
-## Translation manifest
+### Translation manifest
 
 Each translation run writes:
 
@@ -188,7 +189,7 @@ This describes the overall translation run, including:
 * installed package versions
 * relevant environment variables
 
-## Translation ledger
+### Translation ledger
 
 Each run writes:
 
@@ -216,7 +217,7 @@ For every document, it records:
 * status
 * error message, if any
 
-## Error log
+### Error log
 
 Failed translations are written to:
 
@@ -226,7 +227,7 @@ logs/errors.jsonl
 
 This makes it possible to inspect failed files separately without searching through the full ledger.
 
-## File hashing
+### File hashing
 
 The project uses SHA-256 hashes for:
 
