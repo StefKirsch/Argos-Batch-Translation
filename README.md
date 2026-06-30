@@ -40,7 +40,19 @@ Check that it works by opening a new Powershell or terminal window and run:
 uv --version
 ```
 
-### 3. Create a virtual environment for the dependencies
+### 3. Download the code
+
+You can either download the code and files as a ZIP archive or clone the project with git.
+
+For downloading the code directly, click on the green "Code" button above and then select "Download ZIP". You then need to unpack the archive and move it to the location of your choice.
+
+If you have git installed, please navigate Powershell/the terminal to the folder of your choice (see the next steps for instructions for that). Then run
+
+```powershell
+git clone https://github.com/StefKirsch/Argos-Batch-Translation.git
+```
+
+### 4. Create a virtual environment for the dependencies
 
 Navigate Powershell/the terminal to the project folder. On Windows this can be done by 
 1. navigating to that folder in the system explorer
@@ -49,7 +61,7 @@ Navigate Powershell/the terminal to the project folder. On Windows this can be d
 
 ![Open Windows Powershell by typing it in the explorer address bar.](docs/images/open_powershell_windows.png)
 
-Once Windows Powershell is open and pointing to the correct folder, create the a new virtual environment by running:
+Once Windows Powershell/the terminal is open and pointing to the correct folder, create the a new virtual environment by running:
 
 ```powershell
 uv venv
@@ -68,7 +80,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .venv\Scripts\activate
 ```
 
-### 4. Install dependencies
+### 5. Install dependencies
 
 In Powershell/the terminal run:
 
