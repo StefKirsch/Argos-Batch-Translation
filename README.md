@@ -28,10 +28,16 @@ uv python install
 
 ### 2. Install `uv`
 
-If `uv` is not installed yet, run:
+If `uv` is not installed yet, run this command in Windows Powershell:
 
 ```powershell
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Or on Linux or macOS:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 Check that it works by opening a new Powershell or terminal window and run:
