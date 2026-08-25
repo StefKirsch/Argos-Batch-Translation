@@ -120,7 +120,7 @@ Just like in step 4. above, you need to activate the virtual environment. Open a
 .venv\Scripts\activate
 ```
 
-### 2. Run the translation script
+### 3. Run the translation script
 
 In the terminal/Powershell, where you just activated the virtual environment, run
 
