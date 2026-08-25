@@ -67,7 +67,7 @@ Navigate Powershell/the terminal to the project folder. On Windows this can be d
 
 ![Open Windows Powershell by typing it in the explorer address bar.](docs/images/open_powershell_windows.png)
 
-Once Windows Powershell/the terminal is open and pointing to the correct folder, create the a new virtual environment by running:
+Once Windows Powershell/the terminal is open and pointing to the correct folder, create a new virtual environment by running:
 
 ```powershell
 uv venv
@@ -112,11 +112,17 @@ corpora/raw/interview_02.txt
 ...
 ```
 
+### 2. Activate the virtual environment
+
+Just like in step 4. above, you need to activate the virtual environment. Open a terminal and navigate to the root of the project folder. On Windows you can do this in the same way as explained in the step where we created a virtual environment.
+
+```powershell
+.venv\Scripts\activate
+```
+
 ### 2. Run the translation script
 
-Open a terminal and navigate to the root of the project folder. On Windows you can do this in the same way as explained in the step where we created a virtual environment.
-
-In the terminal/Powershell, run
+In the terminal/Powershell, where you just activated the virtual environment, run
 
 ```powershell
 python translate_batch.py
