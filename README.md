@@ -1,8 +1,9 @@
 # Argos Batch Translation
 
-This project batch-translates `.txt` files with Argos Translate.
+This project batch-translates `.txt` files with Argos Translate or Meta NLLB-200.
 
-The current default configuration translates Dutch to English.
+The current default configuration translates Dutch to English with Argos, so existing
+runs keep the same behavior. NLLB-200 is an optional CPU backend.
 
 ---
 
@@ -94,6 +95,10 @@ In Powershell/the terminal run:
 uv pip install -r requirements.txt
 ```
 
+No special GPU drivers or hardware-specific installation steps are needed for NLLB.
+Its optimized runtime supports recent x86-64 and ARM64 CPUs on Windows, Linux, and
+macOS.
+
 ## Usage
 
 ### 1. Add source files
@@ -131,7 +136,7 @@ python translate_batch.py
 The script will:
 
 * download a suitable model if it is missing
-* install the local model into Argos for the current session
+* install the local model into Argos for the current session, or load NLLB on the CPU
 * translate every `.txt` file in `corpora/raw/`
 * write translated files to `corpora/translated/`
 
@@ -143,7 +148,44 @@ corpora/translated/interview_02.en.txt
 ...
 ```
 
-### 3. Change the language pair
+### 4. Use Meta NLLB-200
+
+NLLB uses `facebook/nllb-200-distilled-600M` by default. This is the smallest and
+fastest official NLLB-200 checkpoint. To select it for the current PowerShell
+session, run:
+
+```powershell
+$env:TRANSLATION_BACKEND = "nllb"
+python translate_batch.py
+```
+
+On Linux or macOS, use:
+
+```bash
+TRANSLATION_BACKEND=nllb python translate_batch.py
+```
+
+The public model snapshot (approximately 2.5 GB) is downloaded automatically from
+Hugging Face into `models/huggingface/`; no login or confirmation is required. It is
+reused on later runs. On its first use, the checkpoint is automatically converted
+to an INT8 CTranslate2 model. Later runs reuse that optimized copy. Translation uses
+the CPU, batches text chunks for throughput, and does not require a GPU.
+
+Allow approximately 3.2 GB of free disk space for the original checkpoint and the
+optimized model together. The first run takes longer because conversion happens once.
+
+You can optionally select another compatible NLLB checkpoint or adjust the CPU batch
+size:
+
+```powershell
+$env:NLLB_MODEL_ID = "facebook/nllb-200-distilled-1.3B"
+$env:NLLB_BATCH_SIZE = "4"
+```
+
+The 600M model remains the speed-oriented default. Larger checkpoints need more
+memory and are generally slower.
+
+### 5. Change the language pair
 
 Open `translate_batch.py` and change:
 
@@ -161,7 +203,13 @@ TARGET_LANG = "en"
 
 Please note that the script will download a new model for every new language pair.
 
-### 4. Optional settings
+For NLLB, the common codes `nl`, `en`, `de`, `fr`, `es`, and several others are
+mapped automatically to their FLORES-200 language codes. For any other language,
+set `SOURCE_LANG` and `TARGET_LANG` directly to supported codes such as `nld_Latn`
+and `eng_Latn`. Unlike Argos, one NLLB model supports all its language pairs and is
+downloaded only once.
+
+### 6. Optional settings
 
 For a CPU-only run:
 
@@ -177,7 +225,7 @@ The project records information about the model, input files, output files, soft
 
 ## Model archiving
 
-If the required model is missing, the script downloads an Argos-compatible model and saves it locally:
+If the required Argos model is missing, the script downloads it and saves it locally:
 
 ```text
 models/translate-nl_en.argosmodel
@@ -199,6 +247,16 @@ These files record:
 * model file path
 * model SHA-256 checksum
 * selection rule used for choosing the model
+
+For NLLB, the corresponding records are:
+
+```text
+models/nllb_model_metadata.json
+models/NLLB_SHA256SUMS.txt
+```
+
+They record the Hugging Face model ID, resolved repository revision, source snapshot,
+CTranslate2 conversion settings, and SHA-256 checksum of every optimized model file.
 
 ### Translation manifest
 
@@ -276,3 +334,7 @@ This makes it possible to check whether any input, output, or model file changed
 This code is licenced under the MIT license, which means its available for free and can be modified by anyone. When using this code for publications, please cite [Argos Translate](https://github.com/argosopentech/argos-translate/) as specified there. 
 
 We recommend including this code, the model metadata and the translation logs in your datapackage for transparency.
+
+Meta's NLLB-200 checkpoint has a separate
+[CC-BY-NC-4.0 license and research-use limitations](https://huggingface.co/facebook/nllb-200-distilled-600M).
+Review those terms before using NLLB output, especially outside research.
