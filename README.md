@@ -31,7 +31,7 @@ uv python install
 If `uv` is not installed yet, run this command in Windows Powershell:
 
 ```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 ```
 
 Or on Linux or macOS:
