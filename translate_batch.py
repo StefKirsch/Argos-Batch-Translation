@@ -11,13 +11,16 @@ import argostranslate.package
 import argostranslate.translate
 
 from src.argos_batch_helpers import (
+    SUPPORTED_INPUT_SUFFIXES,
     ensure_argos_model,
+    find_input_files,
     get_package_version,
     normalize_text,
-    read_text_file,
+    read_source_file,
     sha256_bytes,
     sha256_file,
     sha256_text,
+    validate_unique_input_stems,
 )
 from src.audit_logging import safe_error_details, write_ledger_record
 from src.redaction_logbook import generate_redaction_logbook
@@ -36,6 +39,9 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 REDACTED_DIR.mkdir(parents=True, exist_ok=True)
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
+
+input_files = find_input_files(INPUT_DIR)
+validate_unique_input_stems(input_files)
 
 
 MODEL_FILE = ensure_argos_model(
@@ -66,6 +72,7 @@ manifest = {
     "input_dir": str(INPUT_DIR),
     "output_dir": str(OUTPUT_DIR),
     "redacted_dir": str(REDACTED_DIR),
+    "supported_input_formats": sorted(SUPPORTED_INPUT_SUFFIXES),
     "model_file": str(MODEL_FILE),
     "model_file_sha256": model_sha256,
     "model_metadata": model_metadata,
@@ -74,6 +81,7 @@ manifest = {
         "platform": platform.platform(),
         "argostranslate": get_package_version("argostranslate"),
         "ctranslate2": get_package_version("ctranslate2"),
+        "python-docx": get_package_version("python-docx"),
         "sentencepiece": get_package_version("sentencepiece"),
         "ARGOS_DEVICE_TYPE": os.getenv("ARGOS_DEVICE_TYPE"),
         "ARGOS_PACKAGES_DIR": os.getenv("ARGOS_PACKAGES_DIR"),
@@ -100,8 +108,6 @@ error_count = 0
 logging.getLogger("stanza").disabled = True
 
 with ledger_path.open("w", encoding="utf-8") as ledger, error_path.open("w", encoding="utf-8") as errors:
-    input_files = sorted(INPUT_DIR.glob("*.txt"))
-
     for input_path in tqdm(
         input_files,
         desc="Translating files",
@@ -111,6 +117,7 @@ with ledger_path.open("w", encoding="utf-8") as ledger, error_path.open("w", enc
 
         record = {
             "input_file": str(input_path),
+            "input_format": input_path.suffix.lower().removeprefix("."),
             "output_file": str(output_path),
             "source_lang": SOURCE_LANG,
             "target_lang": TARGET_LANG,
@@ -133,7 +140,7 @@ with ledger_path.open("w", encoding="utf-8") as ledger, error_path.open("w", enc
             raw_bytes = input_path.read_bytes()
             raw_sha256 = sha256_bytes(raw_bytes)
 
-            raw_text, encoding = read_text_file(input_path)
+            raw_text, encoding = read_source_file(input_path)
             normalized_text = normalize_text(raw_text)
 
             stage = "translate"

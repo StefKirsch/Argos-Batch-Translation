@@ -1,6 +1,6 @@
 # Argos Batch Translation
 
-This project batch-translates `.txt` files with Argos Translate.
+This project batch-translates `.txt` and `.docx` files with Argos Translate.
 
 The current default configuration translates Dutch to English.
 
@@ -98,7 +98,7 @@ uv pip install -r requirements.txt
 
 ### 1. Add source files
 
-Place your Dutch `.txt` files in:
+Place your Dutch `.txt` or `.docx` files in:
 
 ```text
 corpora/raw/
@@ -108,7 +108,7 @@ Example:
 
 ```text
 corpora/raw/interview_01.txt
-corpora/raw/interview_02.txt
+corpora/raw/interview_02.docx
 ...
 ```
 
@@ -132,7 +132,7 @@ The script will:
 
 * download a suitable model if it is missing
 * install the local model into Argos for the current session
-* translate every `.txt` file in `corpora/raw/` that has no translated output yet
+* translate every `.txt` and `.docx` file in `corpora/raw/` that has no translated output yet
 * write translated files to `corpora/translated/`
 * compare manually corrected files in `corpora/redacted/` with their translated originals
 * write every changed passage to `corpora/redacted/redaction_logbook.xlsx`
@@ -150,6 +150,12 @@ many translations were skipped. To translate those files again, first delete the
 corresponding files from both `corpora/translated/` and `corpora/redacted/`. The
 redaction logbook is still regenerated on every run, including runs where all
 translations are skipped.
+
+For `.docx` input, the script extracts text from body paragraphs and tables in
+document order. Headers, footers, comments, footnotes, images, and text inside
+images are not translated. Translations are always saved as UTF-8 `.txt` files.
+Do not use the same base name for two raw files (for example, both `report.txt`
+and `report.docx`), because both would map to `report.en.txt`.
 
 ### 3. Change the language pair
 
@@ -249,7 +255,8 @@ For every document, it records:
 * model file
 * model checksum
 * timestamp
-* input encoding
+* input format
+* input encoding (`utf-8` for `.txt`; not applicable to `.docx` containers)
 * input file SHA-256 checksum
 * normalized source text SHA-256 checksum
 * output file SHA-256 checksum

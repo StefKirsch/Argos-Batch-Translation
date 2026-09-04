@@ -10,6 +10,9 @@ import zipfile
 import argostranslate.package
 
 
+SUPPORTED_INPUT_SUFFIXES = frozenset({".docx", ".txt"})
+
+
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -57,6 +60,70 @@ def get_package_version(pkg: str) -> str | None:
 
 def read_text_file(path: Path) -> tuple[str, str]:
     return path.read_text(encoding="utf-8"), "utf-8"
+
+
+def read_docx_file(path: Path) -> tuple[str, None]:
+    """Extract translatable text from body paragraphs and tables in a DOCX file."""
+    from docx import Document
+    from docx.table import Table
+    from docx.text.paragraph import Paragraph
+
+    document = Document(path)
+    blocks = []
+
+    for block in document.iter_inner_content():
+        if isinstance(block, Paragraph):
+            blocks.append(block.text)
+        elif isinstance(block, Table):
+            for row in block.rows:
+                blocks.append("\t".join(cell.text for cell in row.cells))
+
+    return "\n".join(blocks), None
+
+
+def read_source_file(path: Path) -> tuple[str, str | None]:
+    """Read a supported source file and return its text and optional encoding."""
+    suffix = path.suffix.lower()
+
+    if suffix == ".txt":
+        return read_text_file(path)
+    if suffix == ".docx":
+        return read_docx_file(path)
+
+    supported = ", ".join(sorted(SUPPORTED_INPUT_SUFFIXES))
+    raise ValueError(f"Unsupported input format '{path.suffix}'; expected {supported}")
+
+
+def find_input_files(input_dir: Path) -> list[Path]:
+    """Return supported files directly inside the raw-input directory."""
+    return sorted(
+        (
+            path
+            for path in input_dir.iterdir()
+            if path.is_file() and path.suffix.lower() in SUPPORTED_INPUT_SUFFIXES
+        ),
+        key=lambda path: path.name.casefold(),
+    )
+
+
+def validate_unique_input_stems(input_files: list[Path]) -> None:
+    """Reject inputs that would resolve to the same translated output filename."""
+    files_by_stem: dict[str, list[Path]] = {}
+    for path in input_files:
+        files_by_stem.setdefault(path.stem.casefold(), []).append(path)
+
+    collisions = [paths for paths in files_by_stem.values() if len(paths) > 1]
+    if not collisions:
+        return
+
+    names = "; ".join(
+        ", ".join(path.name for path in paths)
+        for paths in collisions
+    )
+    raise ValueError(
+        "Raw input files must have unique base names because translated outputs "
+        f"are saved as '<name>.<language>.txt'. Conflicting files: {names}"
+    )
 
 
 def normalize_text(text: str) -> str:

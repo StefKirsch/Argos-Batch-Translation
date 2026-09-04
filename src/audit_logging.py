@@ -6,6 +6,7 @@ from typing import TextIO
 
 LEDGER_FIELDS = frozenset({
     "input_file",
+    "input_format",
     "output_file",
     "source_lang",
     "target_lang",
