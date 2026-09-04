@@ -19,17 +19,20 @@ from src.argos_batch_helpers import (
     sha256_file,
     sha256_text,
 )
+from src.redaction_logbook import generate_redaction_logbook
 
 SOURCE_LANG = "nl"
 TARGET_LANG = "en"
 
 INPUT_DIR = Path("corpora/raw")
 OUTPUT_DIR = Path("corpora/translated")
+REDACTED_DIR = Path("corpora/redacted")
 LOG_DIR = Path("logs")
 MODEL_DIR = Path("models")
 
 INPUT_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+REDACTED_DIR.mkdir(parents=True, exist_ok=True)
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -61,6 +64,7 @@ manifest = {
     "target_lang": TARGET_LANG,
     "input_dir": str(INPUT_DIR),
     "output_dir": str(OUTPUT_DIR),
+    "redacted_dir": str(REDACTED_DIR),
     "model_file": str(MODEL_FILE),
     "model_file_sha256": model_sha256,
     "model_metadata": model_metadata,
@@ -85,6 +89,7 @@ manifest = {
 
 ledger_path = LOG_DIR / "translation_ledger.jsonl"
 error_path = LOG_DIR / "errors.jsonl"
+redaction_logbook_path = REDACTED_DIR / "redaction_logbook.xlsx"
 
 translated_count = 0
 error_count = 0
@@ -152,16 +157,25 @@ with ledger_path.open("w", encoding="utf-8") as ledger, error_path.open("w", enc
 
             error_count += 1
 
+redaction_count, unmatched_redacted_files = generate_redaction_logbook(
+    translated_dir=OUTPUT_DIR,
+    redacted_dir=REDACTED_DIR,
+    logbook_path=redaction_logbook_path,
+)
+
 print(
     json.dumps(
         {
             "status": "done",
             "translated_files": translated_count,
             "error_files": error_count,
+            "redacted_passages": redaction_count,
+            "unmatched_redacted_files": unmatched_redacted_files,
             "model_file": str(MODEL_FILE),
             "ledger": str(ledger_path),
             "errors": str(error_path),
             "manifest": str(LOG_DIR / "translation_manifest.json"),
+            "redaction_logbook": str(redaction_logbook_path),
         },
         ensure_ascii=False,
         indent=2,

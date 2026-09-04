@@ -134,6 +134,8 @@ The script will:
 * install the local model into Argos for the current session
 * translate every `.txt` file in `corpora/raw/`
 * write translated files to `corpora/translated/`
+* compare manually corrected files in `corpora/redacted/` with their translated originals
+* write every changed passage to `corpora/redacted/redaction_logbook.xlsx`
 
 Example output files:
 
@@ -259,6 +261,31 @@ logs/errors.jsonl
 ```
 
 This makes it possible to inspect failed files separately without searching through the full ledger.
+
+### Redaction logbook
+
+If a translation needs a manual correction, copy the translated `.txt` file to
+`corpora/redacted/` without changing its filename or relative path, and edit the
+copy. For example:
+
+```text
+corpora/translated/interview_01.en.txt
+corpora/redacted/interview_01.en.txt
+```
+
+On the next run, the script compares the two versions word by word. Each logged
+passage contains the changed words and up to three words immediately before them.
+Changes separated by six or more unchanged words are written as separate passages.
+Every changed, inserted, or removed passage is written to:
+
+```text
+corpora/redacted/redaction_logbook.xlsx
+```
+
+The Excel workbook contains `filename`, `original version`, `redacted version`, and
+`reason for change`. The default reason is `Wrong translation in context`. You can
+edit a reason in the workbook; later runs preserve it while that correction remains
+unchanged. The file is created with its header even when there are no corrections.
 
 ### File hashing
 
