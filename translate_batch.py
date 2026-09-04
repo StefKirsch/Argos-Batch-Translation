@@ -92,6 +92,7 @@ error_path = LOG_DIR / "errors.jsonl"
 redaction_logbook_path = REDACTED_DIR / "redaction_logbook.xlsx"
 
 translated_count = 0
+skipped_count = 0
 error_count = 0
 
 # Disable spurious mwt warning
@@ -116,6 +117,17 @@ with ledger_path.open("w", encoding="utf-8") as ledger, error_path.open("w", enc
             "model_file_sha256": model_sha256,
             "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         }
+
+        if output_path.is_file():
+            record.update({
+                "status": "skipped",
+                "skip_reason": "translated output already exists",
+                "error_message": None,
+            })
+            ledger.write(json.dumps(record, ensure_ascii=False) + "\n")
+            ledger.flush()
+            skipped_count += 1
+            continue
 
         try:
             raw_bytes = input_path.read_bytes()
@@ -157,6 +169,14 @@ with ledger_path.open("w", encoding="utf-8") as ledger, error_path.open("w", enc
 
             error_count += 1
 
+if skipped_count:
+    print(
+        f"Skipped translation for {skipped_count} existing translated file(s). "
+        f"To translate them again, delete the corresponding files from "
+        f"'{OUTPUT_DIR}' and '{REDACTED_DIR}', then rerun the script.",
+        file=sys.stderr,
+    )
+
 redaction_count, unmatched_redacted_files = generate_redaction_logbook(
     translated_dir=OUTPUT_DIR,
     redacted_dir=REDACTED_DIR,
@@ -168,6 +188,7 @@ print(
         {
             "status": "done",
             "translated_files": translated_count,
+            "skipped_translations": skipped_count,
             "error_files": error_count,
             "redacted_passages": redaction_count,
             "unmatched_redacted_files": unmatched_redacted_files,

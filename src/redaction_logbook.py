@@ -18,6 +18,13 @@ CONTEXT_WORDS = 3
 PASSAGE_BREAK_WORDS = 6
 
 
+def _logbook_permission_error(logbook_path: Path) -> PermissionError:
+    return PermissionError(
+        f"Cannot update the redaction logbook at '{logbook_path}'. "
+        "The file may be open in Excel. Close it and run the script again."
+    )
+
+
 def split_words(text: str) -> list[str]:
     """Split text on whitespace while keeping punctuation with its word."""
     return text.split()
@@ -87,7 +94,10 @@ def _existing_reasons(logbook_path: Path) -> dict[tuple[str, str, str], str]:
     if not logbook_path.exists():
         return {}
 
-    workbook = load_workbook(logbook_path, read_only=True, data_only=False)
+    try:
+        workbook = load_workbook(logbook_path, read_only=True, data_only=False)
+    except PermissionError as error:
+        raise _logbook_permission_error(logbook_path) from error
     try:
         worksheet = workbook.active
         rows = worksheet.iter_rows(values_only=True)
@@ -167,8 +177,16 @@ def generate_redaction_logbook(
             cell.data_type = "s"
             cell.alignment = Alignment(vertical="top", wrap_text=True)
 
-    workbook.save(temporary_path)
-    workbook.close()
-    temporary_path.replace(logbook_path)
+    try:
+        workbook.save(temporary_path)
+        temporary_path.replace(logbook_path)
+    except PermissionError as error:
+        try:
+            temporary_path.unlink(missing_ok=True)
+        except OSError:
+            pass
+        raise _logbook_permission_error(logbook_path) from error
+    finally:
+        workbook.close()
 
     return len(rows), unmatched_files

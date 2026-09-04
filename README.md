@@ -132,7 +132,7 @@ The script will:
 
 * download a suitable model if it is missing
 * install the local model into Argos for the current session
-* translate every `.txt` file in `corpora/raw/`
+* translate every `.txt` file in `corpora/raw/` that has no translated output yet
 * write translated files to `corpora/translated/`
 * compare manually corrected files in `corpora/redacted/` with their translated originals
 * write every changed passage to `corpora/redacted/redaction_logbook.xlsx`
@@ -144,6 +144,12 @@ corpora/translated/interview_01.en.txt
 corpora/translated/interview_02.en.txt
 ...
 ```
+
+If a translated output already exists, the script skips that file and reports how
+many translations were skipped. To translate those files again, first delete the
+corresponding files from both `corpora/translated/` and `corpora/redacted/`. The
+redaction logbook is still regenerated on every run, including runs where all
+translations are skipped.
 
 ### 3. Change the language pair
 
@@ -285,7 +291,9 @@ corpora/redacted/redaction_logbook.xlsx
 The Excel workbook contains `filename`, `original version`, `redacted version`, and
 `reason for change`. The default reason is `Wrong translation in context`. You can
 edit a reason in the workbook; later runs preserve it while that correction remains
-unchanged. The file is created with its header even when there are no corrections.
+unchanged. Close the workbook before running the script again; otherwise the script
+reports that Excel is preventing it from writing the file. The file is created with
+its header even when there are no corrections.
 
 ### File hashing
 
