@@ -256,7 +256,7 @@ For every document, it records:
 * source character count
 * translation character count
 * status
-* error message, if any
+* failure stage and a broad error category, if applicable
 
 ### Error log
 
@@ -266,7 +266,10 @@ Failed translations are written to:
 logs/errors.jsonl
 ```
 
-This makes it possible to inspect failed files separately without searching through the full ledger.
+This makes it possible to identify failed files and the processing stage separately
+without searching through the full ledger. It intentionally contains no detailed
+exception messages; rerun the affected file in a suitably protected environment if
+more detailed diagnosis is needed.
 
 ### Redaction logbook
 

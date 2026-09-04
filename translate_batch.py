@@ -19,6 +19,7 @@ from src.argos_batch_helpers import (
     sha256_file,
     sha256_text,
 )
+from src.audit_logging import safe_error_details, write_ledger_record
 from src.redaction_logbook import generate_redaction_logbook
 
 SOURCE_LANG = "nl"
@@ -122,13 +123,12 @@ with ledger_path.open("w", encoding="utf-8") as ledger, error_path.open("w", enc
             record.update({
                 "status": "skipped",
                 "skip_reason": "translated output already exists",
-                "error_message": None,
             })
-            ledger.write(json.dumps(record, ensure_ascii=False) + "\n")
-            ledger.flush()
+            write_ledger_record(ledger, record)
             skipped_count += 1
             continue
 
+        stage = "read_source"
         try:
             raw_bytes = input_path.read_bytes()
             raw_sha256 = sha256_bytes(raw_bytes)
@@ -136,9 +136,13 @@ with ledger_path.open("w", encoding="utf-8") as ledger, error_path.open("w", enc
             raw_text, encoding = read_text_file(input_path)
             normalized_text = normalize_text(raw_text)
 
+            stage = "translate"
             translated_text = translation.translate(normalized_text)
+
+            stage = "write_translation"
             output_path.write_text(translated_text, encoding="utf-8")
 
+            stage = "record_checksums"
             record.update({
                 "status": "ok",
                 "input_encoding": encoding,
@@ -147,25 +151,20 @@ with ledger_path.open("w", encoding="utf-8") as ledger, error_path.open("w", enc
                 "output_file_sha256": sha256_file(output_path),
                 "source_character_count": len(normalized_text),
                 "translation_character_count": len(translated_text),
-                "error_message": None,
             })
 
-            ledger.write(json.dumps(record, ensure_ascii=False) + "\n")
-            ledger.flush()
+            write_ledger_record(ledger, record)
 
             translated_count += 1
 
         except Exception as e:
             record.update({
                 "status": "error",
-                "error_message": repr(e),
+                **safe_error_details(e, stage),
             })
 
-            errors.write(json.dumps(record, ensure_ascii=False) + "\n")
-            errors.flush()
-
-            ledger.write(json.dumps(record, ensure_ascii=False) + "\n")
-            ledger.flush()
+            write_ledger_record(errors, record)
+            write_ledger_record(ledger, record)
 
             error_count += 1
 
